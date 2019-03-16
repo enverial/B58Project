@@ -1,0 +1,1 @@
+module CleanupDrawings(Clock, Reset, XIn, XOut, YIn, YOut);
