@@ -1,4 +1,4 @@
-module B58Project (SW, HEX0, HEX1, HEX2, CLOCK_50, LEDR);
+module TimerModule (SW, HEX0, HEX1, HEX2, CLOCK_50, LEDR);
 	input [17:0] SW;
 	input CLOCK_50;
 	output [5:0] LEDR;
