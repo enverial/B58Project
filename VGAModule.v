@@ -71,7 +71,7 @@ module VGAModule
 	// for the VGA controller, in addition to any other functionality your design may require.
     
     // Instansiate datapath
-	 DrawCharacter(CurrState, CLOCK_50, resetn, x, y)
+    DrawCharacter(CurrState, CLOCK_50, resetn, x, y)
 
     // Instansiate FSM control
     CharacterFSM charfsm(LeftIn, RightIn, CurrState, CLOCK_50, resetn);
