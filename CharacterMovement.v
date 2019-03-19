@@ -1,7 +1,7 @@
 module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
 	input LeftIn, RightIn, Clock, Reset;
 	output [3:0] reg CurrState;
-   reg [3:0] current_state, next_state; 
+   	reg [3:0] current_state, next_state; 
    
 	localparam  POS0 = 4'd0,
 				   POS1 = 4'd1,
@@ -98,7 +98,7 @@ module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
 		
 	always @(posedge Clock)
 		begin
-		currState <= curr_state;
+		CurrState <= curr_state;
 		end
 	
 endmodule
