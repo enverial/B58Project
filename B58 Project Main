@@ -3,4 +3,5 @@ module B58Project(SW, KEY, LEDR);
   input [3:0] KEY;
   output [10:0] LEDR;
   
+  CharacterFSM charFSM(KEY[1], KEY[0], 
   
