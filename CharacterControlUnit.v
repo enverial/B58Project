@@ -1,4 +1,5 @@
 module KeyboardToCharacterModule(LEDR, CLOCK_50, PS2_KBDAT);
+	// Converts keyboard signals to CharacterControlUnit to send appropriate go left and go right signals
 	output [2:0] LEDR;
 	input CLOCK_50;
 	input PS2_KBDAT;
