@@ -1,4 +1,4 @@
-module B(LEDR, CLOCK_50, PS2_KBDAT);
+module KeyboardToCharacterModule(LEDR, CLOCK_50, PS2_KBDAT);
 	output [2:0] LEDR;
 	input CLOCK_50;
 	input PS2_KBDAT;
