@@ -3,9 +3,12 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 	input Clock, Reset;
 	
 	// X and Y coordinates mark top left corner
-	// Character is 5 x 9 rectangle
+	// Character is 9 x 5 rectangle
 	output reg [7:0] XOut;
 	output reg [6:0] YOut;
+	
+	reg [3:0] XCounter;
+	reg [2:0] YCounter;
 	
 	reg [3:0] SavedState;
 	
@@ -24,48 +27,48 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 			case (SavedState)
 			POS0: 
 				begin
-				XOut <= 8'd6;
-				YOut <= 7'd7;
+				XOut <= 8'd6 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS1:
 				begin
-				XOut <= 8'd24;
-				YOut <= 7'd7;
+				XOut <= 8'd24 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS2:
 				begin
-				XOut <= 8'd42;
-				YOut <= 7'd7;
+				XOut <= 8'd42 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS3:
 				begin
-				XOut <= 8'd60;
-				YOut <= 7'd7;
+				XOut <= 8'd60 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS4:
 				begin
-				XOut <= 8'd78;
-				YOut <= 7'd7;
+				XOut <= 8'd78 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS5:
 				begin
-				XOut <= 8'd96;
-				YOut <= 7'd7;
+				XOut <= 8'd96 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			POS6:
 				begin
-				XOut <= 8'd114;
-				YOut <= 7'd7;
+				XOut <= 8'd114 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end			
 			POS7:
 				begin
-				XOut <= 8'd132;
-				YOut <= 7'd7;
+				XOut <= 8'd132 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end	
 			POS8:
 				begin
-				XOut <= 8'd150;
-				YOut <= 7'd7;
+				XOut <= 8'd150 + XCounter;
+				YOut <= 7'd7 - YCounter;
 				end
 			endcase
 		
@@ -75,5 +78,19 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 			SavedState <= POS4;
 		else
 			SavedState <= CurrState; 
+		end
+        
+	always @(posedge Clock)
+		begin
+		if (!Reset)
+			begin
+			XCounter <= 0;
+			YCounter <= 0;
+			end
+		else
+			begin
+			XCounter <= XCounter + 1;
+			YCounter <= YCounter + 1;
+			end
 		end
 endmodule 
