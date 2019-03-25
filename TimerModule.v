@@ -2,7 +2,7 @@ module TimerModule (SW, HEX0, HEX1, HEX2, CLOCK_50, LEDR);
 	input [17:0] SW;
 	input CLOCK_50;
 	output [5:0] LEDR;
-	output [7:0] HEX0, HEX1, HEX2;
+	output [6:0] HEX0, HEX1, HEX2;
 
 	wire Reset;
 	wire Enable;
@@ -11,9 +11,9 @@ module TimerModule (SW, HEX0, HEX1, HEX2, CLOCK_50, LEDR);
 	
 	RateDivider rateDiv(CLOCK_50, Enable, Reset);
 	Timer timer(CLOCK_50, Enable, LEDR[1], Out, Reset);
-	HexDisplay ones(Out[3:0], HEX0);
-	HexDisplay tens(Out[7:4], HEX1);
-	HexDisplay hundreds({3'b000, Out[2]}, HEX3);
+	HexDisplay ones(Out[3:0], HEX0, CLOCK_50);
+	HexDisplay tens(Out[7:4], HEX1, CLOCK_50);
+	HexDisplay hundreds({3'b000, Out[2]}, HEX3, CLOCK_50);
 
 endmodule
 
@@ -65,16 +65,25 @@ module Timer(Clock, Enable, Done, Out, Reset);
 	end
 endmodule
 
-module HexDisplay(IN, OUT);
-    input reg [2:0] IN;
-	 output reg [7:0] OUT;
+module HexDisplay(IN, OUT, Clock);
+    input [3:0] IN;
+	 input Clock;
+	 output reg [6:0] OUT;
+	 
+	 reg [3:0] ShiftedIn;
+	 
+	 always @(posedge Clock)
+	 begin
+		ShiftedIn <= IN;
+		
+		if (IN > 4'd4)
+			ShiftedIn <= IN + 4'd3;
+	 end
 	 
 	 always @(*)
 	 begin
 		// Shift Add 3 Input
-		if (IN > 4'd4)
-			IN <= IN + 4'd3;
-		case(IN)
+		case(ShiftedIn)
 			4'b0000: OUT = 7'b1000000;
 			4'b0001: OUT = 7'b1111001;
 			4'b0010: OUT = 7'b0100100;
