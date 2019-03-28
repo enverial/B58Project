@@ -1,13 +1,12 @@
-module B58Projectx(SW, LEDR);
+module project58x (SW, LEDR);
 	
 	input [17:0] SW; // switches, 17 is clock, 14 is load_n, 15 is shift right, 16 is Arithmetic shift
 	output [7:0] LEDR; // led out
 	
-	Shifter rightShifter ( 
+	LFSR rightShifter ( 
 		.LoadVal(SW[7:0]),
 		.Load_n(SW[14]),
 		.ShiftRight(SW[15]),
-		.ASR(SW[16]),
 		.clock(SW[17]),
 		.reset_n(SW[9]),
 		.q(LEDR[7:0])
@@ -74,9 +73,9 @@ module ShifterBit (in, shift, load_val, load_n, clock, reset_n, out); // single 
 endmodule
 	
 // 8 bith right shifter
-module Shifter (LoadVal, Load_n, ShiftRight, ASR, clock, reset_n, q);
+module LFSR (LoadVal, Load_n, ShiftRight, clock, reset_n, q);
 	input [7:0] LoadVal; // bits for shift
-	input Load_n, ShiftRight, ASR, clock, reset_n; // in for shifterbit
+	input Load_n, ShiftRight, clock, reset_n; // in for shifterbit
 	wire first_in;
 	output [7:0] q; //output of shift
 	
