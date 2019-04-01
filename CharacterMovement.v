@@ -18,7 +18,11 @@ module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
 		T32 = 4'd9,
 	   	POS3 = 4'd3;
 	
-    // LeftIn and RightIn inputs come from keys, need to use Debouncer and rate controller to stabalize
+	wire LeftDebounce, RightDebounce;
+	
+    	// LeftIn and RightIn inputs come from keys, need to use Debouncer and rate controller to stabalize
+	DeBounce(Clock, Reset, LeftIn, LeftDebounce);
+	DeBounce(Clock, Reset, RightIn, RightDebounce);
 	
 					 
     // Next state logic aka our state table
@@ -26,41 +30,41 @@ module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
     begin: 
         case (current_state)
 	// Leftmost state, can only go right
-	POS0: next_state = RightIn ? T01 : POS0;
-	T01: next_state = RightIn ? T01 : POS1;
-	T10: next_state = LeftIn ? T10 : POS0;
+	POS0: next_state = RightDebounce ? T01 : POS0;
+	T01: next_state = RightDebounce ? T01 : POS1;
+	T10: next_state = LeftDebounce ? T10 : POS0;
 	POS1:
 		begin
-			if (RightIn)
+			if (RightDebounce)
 				next_state = T12;
-			else if (LeftIn)
+			else if (LeftDebounce)
 				next_state = T10;
 			else
 				next_state = POS1;
 		end
-	T12: next_state = RightIn ? T12 : POS2;
-	T21: next_state = LeftIn ? T21 : POS1;
+	T12: next_state = RightDebounce ? T12 : POS2;
+	T21: next_state = LeftDebounce ? T21 : POS1;
 	POS2:
 		begin
-		if (RightIn)
+		if (RightDebounce)
 			next_state = T23;
-		else if (LeftIn)
+		else if (LeftDebounce)
 			next_state = T21;
 		else
 			next_state = POS2;
 		end
-	T23: next_state = RightIn ? T23 : POS3;
-	T32: next_state = LeftIn ? T32 : POS2;
+	T23: next_state = RightDebounce ? T23 : POS3;
+	T32: next_state = LeftDebounce ? T32 : POS2;
 	
 	// Rightmost state, can only go left
-	POS3: next_state = LeftIn ? T32 : POS3;
+	POS3: next_state = LeftDebounce ? T32 : POS3;
         endcase
     end // state_table
 	 
 	 always @(posedge Clock)
 		begin
 		if (!Reset)
-			curr_state = POS4;
+			curr_state = POS0;
 		else
 			curr_state = next_state;
 		end
