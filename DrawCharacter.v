@@ -12,15 +12,11 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 	
 	reg [3:0] SavedState;
 	
-	localparam  POS0 = 4'd0,
-				   POS1 = 4'd1,
-				   POS2 = 4'd2,
-				   POS3 = 4'd3,
-				   POS4 = 4'd4,
-				   POS5 = 4'd5;
-				   POS6 = 4'd6;
-				   POS7 = 4'd7;
-				   POS8 = 4'd8;
+	localparam  
+		POS0 = 4'd0,
+		POS1 = 4'd1,
+		POS2 = 4'd2,
+		POS3 = 4'd3;
 	
 	always @(posedge Clock)
 		begin
@@ -37,37 +33,12 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 				end
 			POS2:
 				begin
-				XOut <= 8'd42 + XCounter;
+				XOut <= 8'd78 + XCounter;
 				YOut <= 7'd7 - YCounter;
 				end
 			POS3:
 				begin
-				XOut <= 8'd60 + XCounter;
-				YOut <= 7'd7 - YCounter;
-				end
-			POS4:
-				begin
-				XOut <= 8'd78 + XCounter;
-				YOut <= 7'd7 - YCounter;
-				end
-			POS5:
-				begin
-				XOut <= 8'd96 + XCounter;
-				YOut <= 7'd7 - YCounter;
-				end
-			POS6:
-				begin
-				XOut <= 8'd114 + XCounter;
-				YOut <= 7'd7 - YCounter;
-				end			
-			POS7:
-				begin
 				XOut <= 8'd132 + XCounter;
-				YOut <= 7'd7 - YCounter;
-				end	
-			POS8:
-				begin
-				XOut <= 8'd150 + XCounter;
 				YOut <= 7'd7 - YCounter;
 				end
 			endcase
