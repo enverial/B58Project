@@ -1,4 +1,4 @@
-module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing);
+module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	input [3:0] CurrState;
 	input Clock, Reset;
 	
