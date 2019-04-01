@@ -3,88 +3,57 @@ module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
 	output [3:0] reg CurrState;
    	reg [3:0] current_state, next_state; 
    
-	localparam  POS0 = 4'd0,
-				   POS1 = 4'd1,
-				   POS2 = 4'd2,
-				   POS3 = 4'd3,
-				   POS4 = 4'd4,
-				   POS5 = 4'd5;
-				   POS6 = 4'd6;
-				   POS7 = 4'd7;
-				   POS8 = 4'd8;
+	// Character will have 4 positions to move between, 0 at the left side
+	// To 3 at the right side of the screen
+	// Transition states in between each movement
+	localparam  
+		POS0 = 4'd0,
+		T01 = 4'd4,
+		T10 = 4'd5,
+	   	POS1 = 4'd1,
+		T12 = 4'd6,
+		T21 = 4'd7,
+	   	POS2 = 4'd2,
+		T23 = 4'd8,
+		T32 = 4'd9,
+	   	POS3 = 4'd3;
+	
+    // LeftIn and RightIn inputs come from keys, need to use Debouncer and rate controller to stabalize
+	
 					 
     // Next state logic aka our state table
     always@(*)
-    begin: state_table 
-            case (current_state)
-					// Leftmost state, can only go right
-					POS0: next_state = RightIn ? POS1 : POS0;
-					POS1:
-						begin
-						if (RightIn)
-							next_state = POS2;
-						else if (LeftIn)
-							next_state = POS0;
-						else
-							next_state = POS1;
-						end
-					POS2:
-						begin
-						if (RightIn)
-							next_state = POS2;
-						else if (LeftIn)
-							next_state = POS1;
-						else
-							next_state = POS2;
-						end
-					POS3:
-					begin
-						if (RightIn)
-							next_state = POS4;
-						else if (LeftIn)
-							next_state = POS2;
-						else
-							next_state = POS3;
-						end
-					POS4:
-						begin
-						if (RightIn)
-							next_state = POS5;
-						else if (LeftIn)
-							next_state = POS3;
-						else
-							next_state = POS4;
-						end
-					POS5:
-						begin
-						if (RightIn)
-							next_state = POS6;
-						else if (LeftIn)
-							next_state = POS4;
-						else
-							next_state = POS5;
-						end
-					POS6:
-						begin
-						if (RightIn)
-							next_state = POS7;
-						else if (LeftIn)
-							next_state = POS5;
-						else
-							next_state = POS6;
-						end
-					POS7:
-						begin
-						if (RightIn)
-							next_state = POS8;
-						else if (LeftIn)
-							next_state = POS6;
-						else
-							next_state = POS7;
-						end
-						
-					// Rightmost state, can only go left
-					POS8: next_state = LeftIn ? POS7 : POS8;
+    begin: 
+        case (current_state)
+	// Leftmost state, can only go right
+	POS0: next_state = RightIn ? T01 : POS0;
+	T01: next_state = RightIn ? T01 : POS1;
+	T10: next_state = LeftIn ? T10 : POS0;
+	POS1:
+		begin
+			if (RightIn)
+				next_state = T12;
+			else if (LeftIn)
+				next_state = T10;
+			else
+				next_state = POS1;
+		end
+	T12: next_state = RightIn ? T12 : POS2;
+	T21: next_state = LeftIn ? T21 : POS1;
+	POS2:
+		begin
+		if (RightIn)
+			next_state = T23;
+		else if (LeftIn)
+			next_state = T21;
+		else
+			next_state = POS2;
+		end
+	T23: next_state = RightIn ? T23 : POS3;
+	T32: next_state = LeftIn ? T32 : POS2;
+	
+	// Rightmost state, can only go left
+	POS3: next_state = LeftIn ? T32 : POS3;
         endcase
     end // state_table
 	 
