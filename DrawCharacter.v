@@ -7,6 +7,7 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	output reg [7:0] XOut;
 	output reg [6:0] YOut;
 	output reg DoneDrawing;
+	output [2:0] Color;
 	
 	reg [3:0] XCounter;
 	reg [2:0] YCounter;
@@ -44,6 +45,7 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 			
 	always @(posedge Clock)
 		begin
+		Color <= 3'b011;
 		if (!Reset)
 			begin
 			XCounter <= 9;
