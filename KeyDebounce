@@ -1,3 +1,4 @@
+// Taken from http://referencedesigner.com/blog/key-debounce-implementation-in-verilog/2649/
 module  DeBounce 
     (
     input   clk, n_reset, button_in,        // inputs
