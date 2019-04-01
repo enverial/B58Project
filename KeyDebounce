@@ -12,7 +12,7 @@ module  DeBounce
     For 50 MHz clock increase value of N accordingly to 21.
      
     */
-    parameter N = 11 ;      
+    parameter N = 21 ;      
  
     reg  [N-1 : 0]  delaycount_reg;                     
     reg  [N-1 : 0]  delaycount_next;
