@@ -6,14 +6,22 @@ module TimerModule (SW, HEX0, HEX1, HEX2, CLOCK_50, LEDR);
 
 	wire Reset;
 	wire Enable;
+	wire [3:0] Ones;
+	wire [3:0] Tens;
 	wire [7:0] Out;
 	assign Reset = SW[17];
 	
+	// Used to convert 50MHZ clock signal to 1Hz
 	RateDivider rateDiv(CLOCK_50, Enable, Reset);
+	
+	// Takes enable signal from Rate Divider and counts down from a specific value.
+	// Sends done signal through Done when complete, counts down when reset is not low
 	Timer timer(CLOCK_50, Enable, LEDR[1], Out, Reset);
-	HexDisplay ones(Out[3:0], HEX0, CLOCK_50);
-	HexDisplay tens(Out[7:4], HEX1, CLOCK_50);
-	HexDisplay hundreds({3'b000, Out[2]}, HEX3, CLOCK_50);
+	ShiftRegister(Out, Ones, Tens, CLOCK_50, Reset); 
+	
+	// Hex displays digits based on timer module
+	HexDisplay ones(Ones, HEX0, CLOCK_50);
+	HexDisplay tens(Tens, HEX1, CLOCK_50);
 
 endmodule
 
@@ -51,7 +59,7 @@ module Timer(Clock, Enable, Done, Out, Reset);
 	begin
 		if (!Reset)
 			begin
-			Out <= 8'd120;
+			Out <= 8'd30;
 			Done <= 1'b0;
 			end
 			
@@ -65,25 +73,52 @@ module Timer(Clock, Enable, Done, Out, Reset);
 	end
 endmodule
 
+module ShiftRegister(IN, ones, tens, Clock, Reset);
+	input [7:0] IN;
+	input Clock, Reset, Enable
+	reg [7:0] OUT;
+	
+	reg [3:0] i;
+	output reg [3:0] ones, tens;
+	
+	always @(posedge Clock)
+		begin
+		if (!Reset)
+			begin
+			OUT <= 0;
+			i <= 7;
+			end
+		else
+			begin
+			// Shift
+			OUT <= {OUT, IN[i]};
+			i <= i - 1;
+			if (i == 0)
+				i <= 7;
+			end
+		end
+	
+	// Shifts digits of input 1 at a time into output and adds 3 to each group of 4 bits
+	// If they are greater than 4
+	always @(*)
+		begin
+		ones <= OUT[3:0];
+		tens <= OUT[7:4];
+			if (ones > 4)
+				ones <= ones + 3;
+			if (tens > 4)
+				tens <= tens + 3;
+		end
+endmodule
+
 module HexDisplay(IN, OUT, Clock);
-    input [3:0] IN;
-	 input Clock;
-	 output reg [6:0] OUT;
-	 
-	 reg [3:0] ShiftedIn;
-	 
-	 always @(posedge Clock)
-	 begin
-		ShiftedIn <= IN;
-		
-		if (IN > 4'd4)
-			ShiftedIn <= IN + 4'd3;
-	 end
-	 
+    	input [3:0] IN;
+    	input Clock;
+	output reg [6:0] OUT;
+	 	 
 	 always @(*)
 	 begin
-		// Shift Add 3 Input
-		case(ShiftedIn)
+		 case(IN)
 			4'b0000: OUT = 7'b1000000;
 			4'b0001: OUT = 7'b1111001;
 			4'b0010: OUT = 7'b0100100;
