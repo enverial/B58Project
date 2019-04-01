@@ -1,7 +1,7 @@
-module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
+module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset);
 	input LeftIn, RightIn, Clock, Reset;
-	output [3:0] reg CurrState;
-   	reg [3:0] current_state, next_state; 
+	output [3:0] reg CurrState, PrevState;
+	reg [3:0] prev_state, current_state, next_state; 
    
 	// Character will have 4 positions to move between, 0 at the left side
 	// To 3 at the right side of the screen
@@ -72,8 +72,10 @@ module CharacterFSM(LeftIn, RightIn, CurrState, Clock, Reset);
 	always @(posedge Clock)
 		begin
 		CurrState <= curr_state;
+		PrevState <= prev_state;
+		if (curr_state != next_state)
+			prev_state <= curr_state;
 		end
-	
 endmodule
 	
    
