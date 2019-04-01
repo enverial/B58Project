@@ -1,5 +1,5 @@
-module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset);
-	input LeftIn, RightIn, Clock, Reset;
+module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset, DoneDrawing);
+	input LeftIn, RightIn, Clock, Reset, DoneDrawing;
 	output [3:0] reg CurrState, PrevState;
 	reg [3:0] prev_state, current_state, next_state; 
    
