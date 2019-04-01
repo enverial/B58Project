@@ -1,4 +1,4 @@
-module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
+module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing);
 	input [3:0] CurrState;
 	input Clock, Reset;
 	
@@ -6,12 +6,11 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 	// Character is 9 x 5 rectangle
 	output reg [7:0] XOut;
 	output reg [6:0] YOut;
+	output reg DoneDrawing;
 	
 	reg [3:0] XCounter;
 	reg [2:0] YCounter;
-	
-	reg [3:0] SavedState;
-	
+
 	localparam  
 		POS0 = 4'd0,
 		POS1 = 4'd1,
@@ -24,44 +23,41 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut);
 			POS0: 
 				begin
 				XOut <= 8'd6 + XCounter;
-				YOut <= 7'd7 - YCounter;
+				YOut <= 7'd102 + YCounter;
 				end
 			POS1:
 				begin
 				XOut <= 8'd24 + XCounter;
-				YOut <= 7'd7 - YCounter;
+				YOut <= 7'd102 + YCounter;
 				end
 			POS2:
 				begin
 				XOut <= 8'd78 + XCounter;
-				YOut <= 7'd7 - YCounter;
+				YOut <= 7'd102 + YCounter;
 				end
 			POS3:
 				begin
 				XOut <= 8'd132 + XCounter;
-				YOut <= 7'd7 - YCounter;
+				YOut <= 7'd102 + YCounter;
 				end
 			endcase
-		
-	always @(posedge Clock)
-		begin
-		if (!Reset)
-			SavedState <= POS4;
-		else
-			SavedState <= CurrState; 
-		end
-        
+			
 	always @(posedge Clock)
 		begin
 		if (!Reset)
 			begin
-			XCounter <= 0;
-			YCounter <= 0;
+			XCounter <= 9;
+			YCounter <= 5;
+			DoneDrawing <= 0;
 			end
-		else
+		else if (WriteEn)
 			begin
-			XCounter <= XCounter + 1;
-			YCounter <= YCounter + 1;
+				if (XCounter > 0)
+					XCounter <= XCounter - 1;
+				if (YCounter > 0)
+				YCounter <= YCounter - 1;
 			end
+		if (XCounter == 0 && YCounter == 0)
+			DoneDrawing <= 1;
 		end
 endmodule 
