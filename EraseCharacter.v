@@ -45,7 +45,7 @@ module EraseCharacter(PrevState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 			
 	always @(posedge Clock)
 		begin
-		Color <= 3'b011;
+		Color <= 3'b111;
 		if (!Reset)
 			begin
 			XCounter <= 9;
