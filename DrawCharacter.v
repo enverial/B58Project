@@ -1,6 +1,6 @@
-module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
+module DrawCharacter(CurrState, WriteEn, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	input [3:0] CurrState;
-	input Clock, Reset;
+	input Clock, Reset, WriteEn;
 	
 	// X and Y coordinates mark top left corner
 	// Character is 9 x 5 rectangle
@@ -21,7 +21,7 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	
 	always @(*)
 		begin
-		if (CurrState == POS0 || CurrState == POS1 || CurrState == POS2 || CurrState == POS3)
+		if (WriteEn)
 			SavedState <= CurrState;
 		end
 	
