@@ -39,4 +39,7 @@ module B58Project(SW, KEY, LEDR, CLOCK_50, HEX0, HEX1);
   // PrevState sends information to EraseCharacter to erase where the character was
   CharacterFSM(LeftIn, RightIn, CurrState, PrevState, CLOCK_50, Reset, DoneDrawing);
   
+  // Draw character and Erase character work in tandem. Draw creates character in new position, erase erases old position
+  // So only one character appears on screen
   DrawCharacter(CurrState, CLOCK_50, Reset, XOut, YOut, DoneDrawing, Color);
+  EraseCharacter(PrevState, CLOCK_50, Reset, XOut, YOut, DoneDrawing, Color);
