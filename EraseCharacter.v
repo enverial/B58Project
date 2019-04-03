@@ -1,6 +1,6 @@
-module EraseCharacter(PrevState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
-	input [3:0] CurrState;
-	input Clock, Reset;
+module EraseCharacter(PrevState, WriteEn, Clock, Reset, XOut, YOut, DoneDrawing, Color);
+	input [3:0] PrevState;
+	input Clock, Reset, WriteEn;
 	
 	// X and Y coordinates mark top left corner
 	// Character is 9 x 5 rectangle
@@ -9,6 +9,7 @@ module EraseCharacter(PrevState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	output reg DoneDrawing;
 	output [2:0] Color;
 	
+	reg [3:0] SavedState;
 	reg [3:0] XCounter;
 	reg [2:0] YCounter;
 
@@ -17,6 +18,12 @@ module EraseCharacter(PrevState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 		POS1 = 4'd1,
 		POS2 = 4'd2,
 		POS3 = 4'd3;
+	
+	always @(*)
+		begin
+		if (WriteEn)
+			SavedState <= PrevState;
+		end
 	
 	always @(posedge Clock)
 		begin
