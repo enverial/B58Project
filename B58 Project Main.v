@@ -8,7 +8,7 @@ module B58Project(SW, KEY, LEDR, CLOCK_50, HEX0, HEX1);
 	assign Reset = SW[17];
   
   // Timer Section --------------------------------------------------------------------------------------------------------------
-  wire EnableTick;
+  wire EnableTick, TimerDone;
 	wire [3:0] Ones;
 	wire [3:0] Tens;
 	wire [7:0] Out;
@@ -18,7 +18,7 @@ module B58Project(SW, KEY, LEDR, CLOCK_50, HEX0, HEX1);
 	
 	// Takes enable signal from Rate Divider and counts down from a specific value.
 	// Sends done signal through Done when complete, counts down when reset is not low
-	Timer(CLOCK_50, EnableTick, LEDR[1], Out, Reset);
+	Timer(CLOCK_50, EnableTick, TimerDone, Out, Reset);
   
   // Shifts output of Timer so that HEX Displays remain accurate
 	ShiftRegister(Out, Ones, Tens, CLOCK_50, Reset); 
@@ -26,6 +26,9 @@ module B58Project(SW, KEY, LEDR, CLOCK_50, HEX0, HEX1);
 	// Hex displays digits based on timer module
 	HexDisplay ones(Ones, HEX0, CLOCK_50);
 	HexDisplay tens(Tens, HEX1, CLOCK_50);
+	
+	// Game state determines if fruit can be drawn or not
+	GameState(TimerDone, StartGame, State, CLOCK_50);
   
   // Character Section --------------------------------------------------------------------------------------------------------
   wire LeftIn, RightIn;
@@ -43,3 +46,10 @@ module B58Project(SW, KEY, LEDR, CLOCK_50, HEX0, HEX1);
   // So only one character appears on screen
   DrawCharacter(CurrState, CLOCK_50, Reset, XOut, YOut, DoneDrawing, Color);
   EraseCharacter(PrevState, CLOCK_50, Reset, XOut, YOut, DoneDrawing, Color);
+
+  // Fruit Section -------------------------------------------------------------------------------------------------------------------------------
+	// Determines if a fruit was caught if its X and Y match CurrState of character
+	hitDetector(CLOCK_50, FruitX, FruitY, CurrState, Colour, Out);
+	score(Enable, Colour, Enable2, Colour2, ScoreOut);
+		    
+		    
