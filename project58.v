@@ -77,8 +77,33 @@ module project58
 	reg speed1 = 2'b00;
 	reg speed2 = 2'b01;
 	reg speed3 = 2'b10;
+	
+	wire [7:0] cur_score;
+	score score1(.enable(isHit1), .colour(colour_car1), .enable2(isHit2), .colour2(colour_car2), .scoreOut(cur_score));
+	hex_display hex0(.IN(cur_score[3:0]), .OUT(HEX0));
+	hex_display hex1(.IN(cur_score[7:4]), .OUT(HEX1));
+
+   assign LEDR[2:0] = colour_car1;
+
+      wire ld_x, ld_y;
+    wire [3:0] stateNum;
+    reg  [6:0] init_player_coord = 7'b0101111; // this is x coord
+    wire [2:0] colour_player;
+    wire [6:0] x_player;
+    wire [6:0] y_player;
+    wire writeEn_player;
+    reg [25:0] counter_for_player = 26'b00000000000000000000000000;
+    reg [6:0] init_y_p = 7'b1110000;
+    reg [2:0] acolour_p = 3'b100;
+	 
+
+    // Instansiate datapath                             
+    datapatha d0(.clk(CLOCK_50), .ld_x(ld_x), .ld_y(ld_y), .in(  init_player_coord), .reset_n(resetn), .x(x_player), .y(y_player), .colour(colour_player), .write(writeEn_player), .stateNum(stateNum), .init_y(init_y_p), .acolour(acolour_p));
    
-     
+    // Instansiate FSM control
+    controla c0(.clk(CLOCK_50), .move_r(~KEY[0]), .move_l(~KEY[3]), .move_d(~KEY[1]), .move_u(~KEY[2]), .reset_n(resetn), .ld_x(ld_x), .ld_y(ld_y), .stateNum(stateNum), .reset_game(reset_game), .dingding(counter_for_player), .how_fast(speed1));
+	  
+	  
     // --------------------------------------car movement starts here, for all cars----------------------------------------------------------
     wire qconnection;
     wire ld_x_car0, ld_y_car0;
@@ -90,7 +115,7 @@ module project58
     wire writeEn_car0;
     reg [25:0] counter_for_car0 = 26'b00000000000000000000000001;
     reg [6:0] init_y_c0 = 7'b0;
-    reg [2:0] acolour_c0 = 8'b00000110;
+    reg [2:0] acolour_c0 = 8'b00000000;
 	 
 	 
     // Instansiate datapath                                
@@ -112,6 +137,7 @@ module project58
     reg [25:0] counter_for_car1 = 26'b00000000000000000000000001;
     reg [6:0] init_y_c1 = 7'b0;
     reg [2:0] acolour_c1 = 8'b01110101;
+	 wire isHit1;
 	 
 	 
     // Instansiate datapath                                
@@ -119,6 +145,9 @@ module project58
    
     // Instansiate FSM control
     control car_1_c(.clk(CLOCK_50), .move_r(alwaysZero), .move_l(alwaysZero), .move_d(alwaysOne),  .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x_car1), .ld_y(ld_y_car1), .stateNum(stateNum_car1), .reset_game(alwaysZero), .dingding(counter_for_car1), .how_fast(speed3), .q(qconnection1));
+	 
+	 // instantiate hitdetector
+	 hitDetector hd1( .clk(CLOCK_50), .fruitx(x_car1), .charx(x_player), .fruity(y_car1), .chary(y_player), .colour(colour_car1), .out(isHit1));
     //car1 movement ends here----------------------------------------------------------------------------------------------------
 	 
 	 wire qconnection2;
@@ -132,13 +161,15 @@ module project58
     reg [25:0] counter_for_car2 = 26'b00000000000000000000000011;
     reg [6:0] init_y_c2 = 7'b0;
     reg [2:0] acolour_c2 = 8'b01000110;
+	 wire isHit2;
     // Instansiate datapath                                
     datapath car_2_d(.clk(CLOCK_50), .ld_x(ld_x_car2), .ld_y(ld_y_car2), .in(car2_coord), .reset_n(resetn), .x(x_car2), .y(y_car2), .colour(colour_car2), .write(writeEn_car2), .stateNum(stateNum_car2),  .init_y(init_y_c2), .icolour(acolour_c2), .q(qconnection2));
    
     // Instansiate FSM control
     control car_2_c(.clk(CLOCK_50), .move_r(alwaysZero), .move_l(alwaysZero), .move_d(alwaysOne),  .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x_car2), .ld_y(ld_y_car2), .stateNum(stateNum_car2), .reset_game(alwaysZero), .dingding(counter_for_car2), .how_fast(speed3), .q(qconnection2));
     //car2 movement ends here-
-     
+    hitDetector hd2( .clk(CLOCK_50), .fruitx(x_car2), .charx(x_player), .fruity(y_car2), .chary(y_player), .colour(colour_car2), .out(isHit2));
+
 	 wire qconnection3;
     wire ld_x_car3, ld_y_car3;
     wire [3:0] stateNum_car3;
@@ -258,7 +289,14 @@ module project58
    
     always @(posedge CLOCK_50)
     begin
-        if (writeEn_car0)    // if player isnt moving, then let the car move
+	      if(writeEn_player) 
+            begin
+                writeEn <= writeEn_player;   //  Do I use   <=   or   =   ????? writeEn, x, y and colour are originally type wire, but I need to make them type reg???  ????????????????????????????????
+                x <= x_player;       
+                y <= y_player;
+                colour = colour_player; // Notice: I made the following variable type reg: writeEn, x, y, colour
+            end
+        else if (writeEn_car0)    // if player isnt moving, then let the car move
             begin
                 writeEn <= writeEn_car0;    
                 x <= x_car0;                       
@@ -323,6 +361,243 @@ module project58
             end     
 	 end
 
+endmodule
+
+module controla(clk, move_r, move_l, move_d, move_u, reset_n, ld_x, ld_y, stateNum, reset_game, dingding, how_fast);
+    input [25:0] dingding; // dingding is the counter! It counts like this: Ding!!! Ding!!! Ding!!! Ding!!! Ding!!!
+    input reset_game;
+    input clk, move_r, move_l, move_d, move_u, reset_n;
+	 input [1:0] how_fast;
+    output reg ld_y, ld_x;
+    reg [3:0] curr, next;
+    output reg [3:0] stateNum;
+    localparam    S_CLEAR    = 4'b0000;
+    localparam S_LOAD_X    = 4'b0001;
+    localparam S_WAIT_Y    = 4'b0010;
+    localparam S_LOAD_Y    = 4'b0011;
+   
+    localparam    wait_input    = 4'b0100;
+    localparam    clear_all    = 4'b0101;
+    localparam    print_right    = 4'b0110;
+    localparam    print_left    = 4'b0111;
+    localparam    print_down    = 4'b1000;
+    localparam    print_up    = 4'b1001;
+    localparam  temp_selecting_state = 4'b1010;
+    localparam after_drawing = 4'b1011;
+    localparam cleanUp = 4'b1100;
+    wire [26:0] press_now;   
+    wire [26:0] press_now_for_car;   
+    wire result_press_now;
+	 reg [25:0] speed;
+    //wire result_for_car;
+    
+	 always @(*)
+	 begin
+		if (how_fast == 2'b00)
+		   speed <= 26'b0101111101011110000100;
+
+		else if (how_fast == 2'b01)
+		   speed <= 26'b010111110101111000010;
+		else
+		   speed <= 26'b01011111010111100001;
+	 end
+	 RateDivider player_counter1(clk, press_now, reset_n, speed);
+	 
+    assign result_press_now = (press_now == dingding) ? 1 : 0;
+   
+    always @(*)
+    begin: state_table
+        case (curr)
+            S_CLEAR: next = S_LOAD_X ;
+            S_LOAD_X: next = S_WAIT_Y;
+            S_WAIT_Y: next = S_LOAD_Y;
+
+            S_LOAD_Y: next = temp_selecting_state; // the next line is edited on Mar 27
+            temp_selecting_state: next = reset_game ? cleanUp : ( ((move_r || move_l || move_d || move_u) && result_press_now) ? clear_all : S_LOAD_Y );
+           
+            clear_all:
+                begin
+                    if(move_r)  // is this how to connect two wires ?????????????????????????????????????????????????????????
+                        next <= print_right;
+                    else if (move_l)    // if player isnt moving, then let the car move
+                        next <= print_left;
+                    else if (move_d)   // if player isnt moving, then let the car move
+                        next <= print_down;
+                    else if (move_u)   // if player isnt moving, then let the car move
+                        next <= print_up;
+                end
+            cleanUp: next = S_CLEAR;
+            //
+            print_right: next = reset_game ? S_LOAD_Y : after_drawing;
+            print_left: next =  reset_game ? S_LOAD_Y : after_drawing;
+            print_down: next = reset_game ? S_LOAD_Y : after_drawing;
+            print_up: next = reset_game ? S_LOAD_Y : after_drawing;
+            after_drawing: next= temp_selecting_state;
+           
+        default: next = S_CLEAR;
+        endcase
+    end
+
+    always@(*)
+    begin: enable_signals
+        ld_x = 1'b0;
+        ld_y = 1'b0;
+        //write = 1'b0;
+        stateNum = 4'b0000;
+        case (curr)
+            S_LOAD_X: begin
+                ld_x = 1'b1;
+                end
+            S_LOAD_Y: begin
+                ld_y = 1'b1;
+                end
+            cleanUp: begin // this IS suppose to be the same as clear all (edited on mar27)
+                stateNum = 4'b0001;
+                ld_y = 1'b0;
+                //write = 1'b1;
+                end
+            clear_all: begin
+                stateNum = 4'b0001;
+                ld_y = 1'b0;
+                //write = 1'b1;
+                end
+           
+            print_right: begin
+                stateNum = 4'b0100;
+                ld_y = 1'b0;
+                //write = 1'b1;
+                end
+           
+            print_down: begin
+                stateNum = 4'b0011;
+                ld_y = 1'b0;
+                //write = 1'b1;
+                end
+               
+            print_left: begin
+                stateNum = 4'b0010;
+                ld_y = 1'b0;
+   
+                //write = 1'b1;
+                end
+               
+            print_up: begin
+                stateNum = 4'b1001;
+                ld_y = 1'b0;
+   
+                //write = 1'b1;
+                end
+               
+            after_drawing: begin
+                stateNum = 4'b1000;
+                end
+           
+           
+        endcase
+    end
+
+    always @(posedge clk)
+    begin: states
+        if(!reset_n)
+            curr <= S_LOAD_X;
+        else
+            curr <= next;
+    end
+
+endmodule
+
+module datapatha(clk, ld_x, ld_y, in, reset_n, x, y, colour, stateNum, write, init_y, acolour);
+    input clk;
+    input [6:0] in;
+    input [6:0] init_y;
+    input [2:0] acolour;
+    input ld_x, ld_y;
+    input reset_n;
+    output reg [2:0] colour;
+    output reg write;
+    output reg [6:0] y;
+    output reg [6:0] x;
+    input [3:0] stateNum;
+
+    always @(posedge clk)
+    begin
+        if(!reset_n)
+        begin
+            x <= 6'b000000;
+            y <= 6'b000000;
+            colour <= 3'b000;
+        end
+        else
+        begin
+            if(ld_x)
+                begin
+                    x[6:0] <= in;
+                    y <= init_y;
+                    write <= 1'b0;
+                end
+            else if(ld_y)
+                begin
+                    write <= 1'b0;
+                end
+               
+            // The following is for clearing
+            else if(stateNum == 4'b0001)
+                begin
+                    colour <= 3'b000;
+                    write <= 1'b1;
+                end
+               
+            // The following is for moving right
+            else if(stateNum == 4'b0100)   
+                begin
+               
+                    x[6:0] <= x + 6'b000001;
+                    colour <= acolour;
+                    write <= 1'b1;
+                end
+               
+            // The following is for moving left
+            else if(stateNum == 4'b0010)   
+                begin
+               
+                    x[6:0] <= x - 6'b000001;
+                    colour <= acolour;
+                    write <= 1'b1;
+                end
+               
+            // The following is for moving down
+            else if(stateNum == 4'b0011)
+					 begin
+							begin
+							if (x != 7'b1110000)
+								begin
+						  
+								  y[6:0] <= y + 6'b000001;
+								  colour <= acolour;
+								  write <= 1'b1;
+								end
+							else
+									write <= 1'b0;
+							
+							end
+                end
+               
+            else if(stateNum == 4'b1001)//for moving up
+                begin
+               
+                    y[6:0] <= y - 6'b000001;
+                    colour <= acolour;
+                    write <= 1'b1;
+                end
+               
+            else if(stateNum == 4'b1000)//after drawing
+                begin
+                    write <= 1'b0;
+                end
+               
+        end
+    end
+   
 endmodule
 
 
@@ -622,3 +897,4 @@ module RateDivider (clock, q, Clear_b, how_speedy);  // Note that car is 4 times
     //    q <= q - 1'b1;  // decrement q
     end
 endmodule
+
