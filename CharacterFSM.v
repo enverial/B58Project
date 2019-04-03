@@ -1,5 +1,6 @@
-module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset, DoneDrawing);
+module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset, DoneDrawing, WriteEn);
 	input LeftIn, RightIn, Clock, Reset, DoneDrawing;
+	output WriteEn;
 	output [3:0] reg CurrState, PrevState;
 	reg [3:0] prev_state, current_state, next_state; 
    
@@ -78,6 +79,10 @@ module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset, DoneDra
 		PrevState <= prev_state;
 		if (curr_state != next_state)
 			prev_state <= curr_state;
+		if (CurrState == POS0 || CurrState == POS1 || CurrState == POS2 || CurrState == POS3)
+			WriteEn <= 1;
+		else
+			WriteEn <= 0;
 		end
 endmodule
 	
