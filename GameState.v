@@ -1,5 +1,5 @@
-module GameState(TimerDone, StartGame, State);
-  input TimerDone, StartGame;
+module GameState(TimerDone, StartGame, State, Clock);
+  input TimerDone, StartGame, Clock;
   output reg State;
   reg [1:0] current_state, next_state;
   
