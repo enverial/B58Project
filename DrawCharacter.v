@@ -9,6 +9,7 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 	output reg DoneDrawing;
 	output [2:0] Color;
 	
+	reg [3:0] SavedState;
 	reg [3:0] XCounter;
 	reg [2:0] YCounter;
 
@@ -17,6 +18,12 @@ module DrawCharacter(CurrState, Clock, Reset, XOut, YOut, DoneDrawing, Color);
 		POS1 = 4'd1,
 		POS2 = 4'd2,
 		POS3 = 4'd3;
+	
+	always @(*)
+		begin
+		if (CurrState == POS0 || CurrState == POS1 || CurrState == POS2 || CurrState == POS3)
+			SavedState <= CurrState;
+		end
 	
 	always @(posedge Clock)
 		begin
