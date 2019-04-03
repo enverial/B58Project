@@ -65,8 +65,11 @@ module CharacterFSM(LeftIn, RightIn, CurrState, PrevState, Clock, Reset, DoneDra
 		begin
 		if (!Reset)
 			curr_state = POS0;
+		// Locks in current state until DoneDrawing Signal is sent from DrawCharacter
+		else if (!DoneDrawing)
+			curr_state <= curr_state;
 		else
-			curr_state = next_state;
+			curr_state <= next_state;
 		end
 		
 	always @(posedge Clock)
