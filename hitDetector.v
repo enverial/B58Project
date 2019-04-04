@@ -14,8 +14,14 @@ module project58xy (SW, LEDR);
 endmodule
 
 
-module hitDetector(clk, fruitx, fruity, charx, chary, colour, out);
+module hitDetector(clk, fruitx ,fruitx2,fruitx3,fruitx4,fruitx5,fruitx6,fruitx7, fruity, charx, chary, colour, out);
    input clk;
+	input [6:0] fruitx7;
+	input [6:0] fruitx6;
+	input [6:0] fruitx5;
+	input [6:0] fruitx4;
+	input [6:0] fruitx3;
+	input [6:0] fruitx2;
 	input [6:0] fruitx;
 	input [6:0] fruity;
 	input [6:0] charx;
@@ -25,39 +31,34 @@ module hitDetector(clk, fruitx, fruity, charx, chary, colour, out);
 	
 	always @(posedge clk)
 	begin
-	    out = (fruitx == charx) && (fruity == chary) && (colour != 3'b111); // we want the coordinates to be the same and not be black
+	    out = ((fruitx7 == charx) || (fruitx6 == charx) || (fruitx5 == charx) || (fruitx4 == charx) || (fruitx3 == charx) || (fruitx2 == charx)|| (fruitx == charx)) && (fruity == chary) && (colour != 3'b111); // we want the coordinates to be the same and not be black
 	end
 endmodule
 
-module score(enable, colour,enable2, colour2, scoreOut);
+module score(enable, enable2, colour, scoreOut);
 	input enable;
-	input [2:0] colour;
 	input enable2;
-	input [2:0] colour2;
+	input [2:0] colour;
 	output reg [7:0] scoreOut;
    initial
    begin
        scoreOut = 8'b0;
 	end 
 	
-	always @(posedge enable, posedge enable2)
+	always @(posedge enable)
 	begin
-	   if (enable)
-		begin
-			case(colour)
-				3'b000: scoreOut = scoreOut + 1'b1;
-				3'b001: scoreOut = scoreOut + 2'b10;
-				3'b010: scoreOut = scoreOut + 2'b11;
-				3'b011: scoreOut = scoreOut + 3'b100;
-				3'b100: scoreOut = scoreOut - 1'b1;
-				3'b101: scoreOut = scoreOut + 3'b101;
-				3'b110: scoreOut = scoreOut - 2'b10;
-				3'b111: scoreOut = scoreOut + 2'b10;
-				default: scoreOut = scoreOut + 1'b0;
-			endcase
-		end
+		case(colour)
+			3'b000: scoreOut = scoreOut + 1'b1;
+			3'b001: scoreOut = scoreOut + 2'b10;
+			3'b010: scoreOut = scoreOut + 2'b11;
+			3'b011: scoreOut = scoreOut + 3'b100;
+			3'b100: scoreOut = scoreOut - 1'b1;
+			3'b101: scoreOut = scoreOut + 3'b101;
+			3'b110: scoreOut = scoreOut - 2'b10;
+			3'b111: scoreOut = scoreOut + 2'b10;
+			default: scoreOut = scoreOut + 1'b0;
+		endcase
 	end
-	
 endmodule
 
 module hex_display(IN, OUT);

@@ -79,7 +79,7 @@ module project58
 	reg speed3 = 2'b10;
 	
 	wire [7:0] cur_score;
-	score score1(.enable(isHit1), .colour(colour_car1), .enable2(isHit2), .colour2(colour_car2), .scoreOut(cur_score));
+	score score1(.enable(isHit1), .colour(colour_car1), .enable2(isHit2), .scoreOut(cur_score));
 	hex_display hex0(.IN(cur_score[3:0]), .OUT(HEX0));
 	hex_display hex1(.IN(cur_score[7:4]), .OUT(HEX1));
 
@@ -147,7 +147,7 @@ module project58
     control car_1_c(.clk(CLOCK_50), .move_r(alwaysZero), .move_l(alwaysZero), .move_d(alwaysOne),  .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x_car1), .ld_y(ld_y_car1), .stateNum(stateNum_car1), .reset_game(alwaysZero), .dingding(counter_for_car1), .how_fast(speed3), .q(qconnection1));
 	 
 	 // instantiate hitdetector
-	 hitDetector hd1( .clk(CLOCK_50), .fruitx(x_car1), .charx(x_player), .fruity(y_car1), .chary(y_player), .colour(colour_car1), .out(isHit1));
+	 hitDetector hd1( .clk(CLOCK_50), .fruitx(x_car1), .fruitx2(x_car3), .fruitx3(x_car4), .fruitx4(x_car5), .fruitx5(x_car6),.fruitx6(x_car7), .fruitx7(x_car8), .charx(x_player), .fruity(y_car1), .chary(y_player), .colour(colour_car1), .out(isHit1));
     //car1 movement ends here----------------------------------------------------------------------------------------------------
 	 
 	 wire qconnection2;
@@ -161,14 +161,12 @@ module project58
     reg [25:0] counter_for_car2 = 26'b00000000000000000000000011;
     reg [6:0] init_y_c2 = 7'b0;
     reg [2:0] acolour_c2 = 8'b01000110;
-	 wire isHit2;
     // Instansiate datapath                                
     datapath car_2_d(.clk(CLOCK_50), .ld_x(ld_x_car2), .ld_y(ld_y_car2), .in(car2_coord), .reset_n(resetn), .x(x_car2), .y(y_car2), .colour(colour_car2), .write(writeEn_car2), .stateNum(stateNum_car2),  .init_y(init_y_c2), .icolour(acolour_c2), .q(qconnection2));
    
     // Instansiate FSM control
     control car_2_c(.clk(CLOCK_50), .move_r(alwaysZero), .move_l(alwaysZero), .move_d(alwaysOne),  .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x_car2), .ld_y(ld_y_car2), .stateNum(stateNum_car2), .reset_game(alwaysZero), .dingding(counter_for_car2), .how_fast(speed3), .q(qconnection2));
     //car2 movement ends here-
-    hitDetector hd2( .clk(CLOCK_50), .fruitx(x_car2), .charx(x_player), .fruity(y_car2), .chary(y_player), .colour(colour_car2), .out(isHit2));
 
 	 wire qconnection3;
     wire ld_x_car3, ld_y_car3;
@@ -181,13 +179,14 @@ module project58
     reg [25:0] counter_for_car3 = 26'b00000000000000000000000100;
     reg [6:0] init_y_c3 = 7'b0;
     reg [2:0] acolour_c3 = 8'b00001111;
+	 wire isHit2;
+
     // Instansiate datapath                                
     datapath car_3_d(.clk(CLOCK_50), .ld_x(ld_x_car3), .ld_y(ld_y_car3), .in(car3_coord), .reset_n(resetn), .x(x_car3), .y(y_car3), .colour(colour_car3), .write(writeEn_car3), .stateNum(stateNum_car3),  .init_y(init_y_c3), .icolour(acolour_c3), .q(qconnection3));
    
     // Instansiate FSM control
     control car_3_c(.clk(CLOCK_50), .move_r(alwaysZero), .move_l(alwaysZero), .move_d(alwaysOne),  .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x_car3), .ld_y(ld_y_car3), .stateNum(stateNum_car3), .reset_game(alwaysZero), .dingding(counter_for_car3), .how_fast(speed3), .q(qconnection3));
     //car3 movement ends here----------------------------------------------------------------------------------------------------
-     
     
 	 wire qconnection4;
     wire ld_x_car4, ld_y_car4;
