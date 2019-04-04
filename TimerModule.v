@@ -1,4 +1,4 @@
-module project58 (SW, HEX0, HEX1, CLOCK_50, LEDR);
+module project58u (SW, HEX0, HEX1, CLOCK_50, LEDR);
 	input [17:0] SW;
 	input CLOCK_50;
 	output [5:0] LEDR;

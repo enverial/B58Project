@@ -17,6 +17,8 @@ module project58
         VGA_B,                           //    VGA Blue[9:0]
         HEX0,
         HEX1,
+		  HEX2,
+		  HEX3,
 		  LEDR
     );
     input            CLOCK_50;                //    50 MHz
@@ -25,6 +27,8 @@ module project58
 	 output [7:0] LEDR;
     output   [6:0] HEX0;
     output   [6:0] HEX1;
+	 output   [6:0] HEX2;
+	 output   [6:0] HEX3;
     // Declare your inputs and outputs here
     // Do not change the following outputs
     output            VGA_CLK;                   //    VGA Clock
@@ -78,14 +82,29 @@ module project58
 	reg speed2 = 2'b01;
 	reg speed3 = 2'b10;
 	
+	// score reset stuff
+	
+	wire [7:0] out;
+	wire done;
+	wire tick;
+	
+	RateDividerTimer rateDiv(.Clock(CLOCK_50), .OutTick(tick), .Reset(done));
+	Timer timer(.Clock(CLOCK_50), .Enable(tick), .Done(done), .Out(out));
+	hex_display hex3(.IN(out[7:4]), .OUT(HEX3));
+	hex_display hex2(.IN(out[3:0]), .OUT(HEX2));
+	
+	
+	
+	// hit detection stuff
+	
 	wire [7:0] cur_score;
-	score score1(.enable(isHit1), .colour(colour_car1), .enable2(isHit2), .scoreOut(cur_score));
+	score score1(.enable(isHit1), .reset(done), .colour(colour_car1),.scoreOut(cur_score));
 	hex_display hex0(.IN(cur_score[3:0]), .OUT(HEX0));
 	hex_display hex1(.IN(cur_score[7:4]), .OUT(HEX1));
 
    assign LEDR[2:0] = colour_car1;
 
-      wire ld_x, ld_y;
+    wire ld_x, ld_y;
     wire [3:0] stateNum;
     reg  [6:0] init_player_coord = 7'b0101111; // this is x coord
     wire [2:0] colour_player;
@@ -101,7 +120,7 @@ module project58
     datapatha d0(.clk(CLOCK_50), .ld_x(ld_x), .ld_y(ld_y), .in(  init_player_coord), .reset_n(resetn), .x(x_player), .y(y_player), .colour(colour_player), .write(writeEn_player), .stateNum(stateNum), .init_y(init_y_p), .acolour(acolour_p));
    
     // Instansiate FSM control
-    controla c0(.clk(CLOCK_50), .move_r(~KEY[0]), .move_l(~KEY[3]), .move_d(~KEY[1]), .move_u(~KEY[2]), .reset_n(resetn), .ld_x(ld_x), .ld_y(ld_y), .stateNum(stateNum), .reset_game(reset_game), .dingding(counter_for_player), .how_fast(speed1));
+    controla c0(.clk(CLOCK_50), .move_r(~KEY[0]), .move_l(~KEY[3]), .move_d(alwaysZero), .move_u(alwaysZero), .reset_n(resetn), .ld_x(ld_x), .ld_y(ld_y), .stateNum(stateNum), .reset_game(reset_game), .dingding(counter_for_player), .how_fast(speed1));
 	  
 	  
     // --------------------------------------car movement starts here, for all cars----------------------------------------------------------
@@ -160,7 +179,7 @@ module project58
     wire writeEn_car2;
     reg [25:0] counter_for_car2 = 26'b00000000000000000000000011;
     reg [6:0] init_y_c2 = 7'b0;
-    reg [2:0] acolour_c2 = 8'b01000110;
+    reg [2:0] acolour_c2 = 8'b0101011;
     // Instansiate datapath                                
     datapath car_2_d(.clk(CLOCK_50), .ld_x(ld_x_car2), .ld_y(ld_y_car2), .in(car2_coord), .reset_n(resetn), .x(x_car2), .y(y_car2), .colour(colour_car2), .write(writeEn_car2), .stateNum(stateNum_car2),  .init_y(init_y_c2), .icolour(acolour_c2), .q(qconnection2));
    
@@ -178,7 +197,7 @@ module project58
     wire writeEn_car3;
     reg [25:0] counter_for_car3 = 26'b00000000000000000000000100;
     reg [6:0] init_y_c3 = 7'b0;
-    reg [2:0] acolour_c3 = 8'b00001111;
+    reg [2:0] acolour_c3 = 8'b00001011;
 	 wire isHit2;
 
     // Instansiate datapath                                
@@ -234,7 +253,7 @@ module project58
     wire writeEn_car6;
     reg [25:0] counter_for_car6 = 26'b00000000000000000000000111;
     reg [6:0] init_y_c6 = 7'b0;
-    reg [2:0] acolour_c6 = 8'b01001001;
+    reg [2:0] acolour_c6 = 8'b01001011;
     // Instansiate datapath                                
     datapath car_6_d(.clk(CLOCK_50), .ld_x(ld_x_car6), .ld_y(ld_y_car6), .in(car6_coord), .reset_n(resetn), .x(x_car6), .y(y_car6), .colour(colour_car6), .write(writeEn_car6), .stateNum(stateNum_car6),  .init_y(init_y_c6), .icolour(acolour_c6), .q(qconnection6));
    

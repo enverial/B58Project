@@ -35,9 +35,9 @@ module hitDetector(clk, fruitx ,fruitx2,fruitx3,fruitx4,fruitx5,fruitx6,fruitx7,
 	end
 endmodule
 
-module score(enable, enable2, colour, scoreOut);
+module score(enable, reset, colour, scoreOut);
 	input enable;
-	input enable2;
+	input reset;
 	input [2:0] colour;
 	output reg [7:0] scoreOut;
    initial
@@ -59,6 +59,8 @@ module score(enable, enable2, colour, scoreOut);
 			default: scoreOut = scoreOut + 1'b0;
 		endcase
 	end
+	
+		
 endmodule
 
 module hex_display(IN, OUT);
